@@ -1,0 +1,104 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Profile {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  firstName      String?
+  lastName       String?
+  avatarUrl      String?
+  contactDetails String?
+  user           User?    @relation(fields: [userId], references: [id])
+  userId         String?
+}
+
+model Ad {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  title        String?
+  description  String?
+  price        Float?
+  status       String?
+  photos       String?
+  videos       String?
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  categoryId   String?
+  transactions Transaction[]
+  messages     Message[]
+  reviews      Review[]
+  user         User?         @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   String?
+  timestamp DateTime?
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+  ad        Ad?       @relation(fields: [adId], references: [id])
+  adId      String?
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String?
+  description String?
+  ads         Ad[]
+}
+
+model Review {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  rating    Int?
+  comment   String?
+  timestamp DateTime?
+  ad        Ad?       @relation(fields: [adId], references: [id])
+  adId      String?
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  amount        Float?
+  status        String?
+  paymentMethod String?
+  user          User?    @relation(fields: [userId], references: [id])
+  userId        String?
+  ad            Ad?      @relation(fields: [adId], references: [id])
+  adId          String?
+}
+
+model User {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  firstName    String?
+  lastName     String?
+  username     String        @unique
+  email        String?       @unique
+  password     String
+  roles        Json
+  role         String?
+  transactions Transaction[]
+  messages     Message[]
+  profiles     Profile[]
+  ads          Ad[]
+  reviews      Review[]
+}
